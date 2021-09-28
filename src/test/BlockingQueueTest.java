@@ -66,6 +66,6 @@ public class BlockingQueueTest {
 
         // 打印运行耗时
         long endTime = System.currentTimeMillis();
-        System.out.println("总耗时：" + (endTime - startTime) / 1000+"s");
+        System.out.println("总耗时：" + (endTime - startTime) + "ms");
     }
 }

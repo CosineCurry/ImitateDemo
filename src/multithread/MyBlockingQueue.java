@@ -55,10 +55,12 @@ public class MyBlockingQueue {
                 if (size != capacity) {
                     // 执行入队操作
                     enqueue(e);
+                    // 唤醒所有休眠等待的线程
+                    this.notifyAll();
                     break;
                 }
-                // 队列满了休眠200ms
-                Thread.sleep(200L);
+                // 队列满了进入休眠
+                this.wait();
             }
         }
     }
@@ -77,10 +79,12 @@ public class MyBlockingQueue {
                 if (size > 0) {
                     // 执行出队操作
                     e = dequeue();
+                    // 唤醒所有等待的线程
+                    this.notifyAll();
                     break;
                 }
-                // 队列空了休眠200ms
-                Thread.sleep(200L);
+                // 队列空了进入休眠
+                this.wait();
             }
         }
         return e;
