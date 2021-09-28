@@ -1,7 +1,8 @@
 package multithread;
 
+
 /**
- * @Description: TODO
+ * @Description: 阻塞队列，利用链表去实现，头部插入，尾部删除。
  * @Author: cosine
  * @Date: 2021/9/28 4:05 下午
  * @Version: 1.0.0
@@ -26,15 +27,90 @@ public class MyBlockingQueue {
     private int size;
 
     /**
-     * @Author kongshuaiying
-     * @Description TODO
-     * @Date 10:43 下午 2021/9/27
-     * @Param [capacity]
+     * @Description 含有容量的构造方法
+     * @Param [capacity] 容量
      * @return
+     * @Author cosine
+     * @Date 2021/9/28
      */
     public MyBlockingQueue(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException();
+        }
         this.capacity = capacity;
     }
 
+    /**
+     * @Description 对外提供的put加入阻塞队列的方法
+     * @Param [e]
+     * @return void
+     * @Author cosine
+     * @Date 2021/9/28
+     */
+    public void put(Object e) throws InterruptedException {
 
+        while (true) {
+            synchronized (this) {
+                // 队列未满的时候执行入队操作并跳出循环
+                if (size != capacity) {
+                    // 执行入队操作
+                    enqueue(e);
+                    break;
+                }
+                // 队列满了休眠200ms
+                Thread.sleep(200L);
+            }
+        }
+    }
+
+    /**
+     * @Description 对外提供的take取出一个元素的方法
+     * @return Object
+     * @Author cosine
+     * @Date 2021/9/28
+     */
+    public Object take() throws InterruptedException {
+        Object e;
+        while (true) {
+            synchronized (this) {
+                // 队列没有空的时候执行出队操作并跳出循环
+                if (size > 0) {
+                    // 执行出队操作
+                    e = dequeue();
+                    break;
+                }
+                // 队列空了休眠200ms
+                Thread.sleep(200L);
+            }
+        }
+        return e;
+    }
+
+    private void enqueue(Object o) {
+        Node node = new Node(o);
+        // 队列为空
+        if (size == 0) {
+            head = node;
+            tail = node;
+        } else {//队列不为空
+            node.next = head;
+            head.pre = node;
+            head = node;
+        }
+        size++;
+    }
+
+    private Object dequeue() {
+        Object o = tail.object;
+        // 如果阻塞队列中只有一个元素
+        if (head == tail) {
+            head = null;
+            tail = null;
+        } else {
+            tail.pre.next = null;
+            tail = tail.pre;
+        }
+        size--;
+        return o;
+    }
 }
